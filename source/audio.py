@@ -19,6 +19,7 @@ class Mixer:
     SOUNDS = {name: Sound(filename) for name, filename in SOUND_DATA.items()}
     theme = pygame.mixer.music
     theme.load(os.path.join(PATH["audio"], SOUND_DATA["theme"]))
+    enabled = False
 
     @classmethod
     def play(cls, key):
@@ -27,7 +28,8 @@ class Mixer:
         def outer_wrapper(function):
             @wraps(function)
             def inner_wrapper(self, *args, **kwargs):
-                sound.play()
+                if cls.enabled:
+                    sound.play()
                 return function(self, *args, **kwargs)
             return inner_wrapper
         return outer_wrapper

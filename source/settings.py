@@ -31,6 +31,7 @@ KEYS = {key: pygame.key.key_code(parser.get("KEYS", key)) for key in parser["KEY
 
 DELAY = parser.getint("SETTINGS", "period")
 TILE = parser.getint("SETTINGS", "tile size")
+VOLUME = parser.getint("SETTINGS", "volume") / 100
 ACCELERATION = parser.getfloat("SETTINGS", "acceleration")
 
 GAP = TILE // 12
@@ -42,11 +43,13 @@ DIM = {
     "field": (0, HEAD, *FIELD),
     "next": (TILE * FIELD[0], TILE // 2 + HEAD),
     "next_label": (TILE * (FIELD[0] + 2.5), TILE + HEAD),
-    "score": (TILE * (FIELD[0] + 2.5), TILE * 6 + HEAD),
-    "shadow_label": (TILE * (FIELD[0] + 2.5), TILE * 9.5 + HEAD),
-    "shadow_switch": (TILE * (FIELD[0] + 1.5), TILE * 10 + HEAD),
-    "music_label": (TILE * (FIELD[0] + 2.5), TILE * 12.5 + HEAD),
-    "music_switch": (TILE * (FIELD[0] + 1.5), TILE * 13 + HEAD),
+    "score": (TILE * (FIELD[0] + 2.5), TILE * 5.5 + HEAD),
+    "shadow_label": (TILE * (FIELD[0] + 2.5), TILE * 8.5 + HEAD),
+    "shadow_switch": (TILE * (FIELD[0] + 1.5), TILE * 9 + HEAD),
+    "sound_label": (TILE * (FIELD[0] + 2.5), TILE * 11 + HEAD),
+    "sound_switch": (TILE * (FIELD[0] + 1.5), TILE * 11.5 + HEAD),
+    "music_label": (TILE * (FIELD[0] + 2.5), TILE * 13.5 + HEAD),
+    "music_switch": (TILE * (FIELD[0] + 1.5), TILE * 14 + HEAD),
     "status": (TILE * (FIELD[0] + 2.5), TILE * 16.5 + HEAD),
     "header": (0, 0, TILE * (FIELD[0] + 5), HEAD),
     "header_text": (GAP, GAP),

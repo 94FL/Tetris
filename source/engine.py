@@ -1,22 +1,26 @@
+from ctypes import windll, wintypes, pointer
+
 import pygame
-from audio import Sound
+from audio import Mixer
 from classes import Field, Next
-from interface import Button, Switch, KeyTooltip
 from clock import Clock
 from events import EventHandler
-from audio import Mixer
-from settings import DIM, FPS, COLORS, KEYS, FONT, TILE, DELAY, GAP, ACCELERATION, vec
+from interface import Widget, Button, Switch, KeyTooltip
+from settings import DIM, FPS, COLORS, KEYS, FONT, TILE, DELAY, VOLUME, ACCELERATION, vec
 
 
 class Engine:
 
     display = pygame.display.set_mode(DIM["screen"], pygame.NOFRAME)
     IMAGES = None
+    TITLE = "Tetris"
 
     def __init__(self):
 
         Field.generate_images()
-        Mixer.set_volume(0.05)
+        Mixer.set_volume(VOLUME)
+
+        self.window_handle = pygame.display.get_wm_info()['window']
 
         self.clock = Clock()
         self.logic_timer = self.clock.timer(DELAY, periodic=True)
@@ -28,8 +32,10 @@ class Engine:
 
         self.exit_button = Button(self, self.event_handler, DIM["exit_button"], COLORS["text_1"])
         self.keys_button = Button(self, self.event_handler, DIM["keys_button"], COLORS["text_3"])
-        self.shadow_switch = Switch(self, self.event_handler, DIM["shadow_switch"])
+        self.shadow_switch = Switch(self, self.event_handler, DIM["shadow_switch"], state=True)
         self.music_switch = Switch(self, self.event_handler, DIM["music_switch"])
+        self.sound_switch = Switch(self, self.event_handler, DIM["sound_switch"])
+        self.header = Widget(self, self.event_handler, DIM["header"])
 
         self.running = [False, False, False]
 
@@ -56,6 +62,7 @@ class Engine:
 
     def events(self):
         self.event_handler.update()
+
         if self.event_handler['exit']:
             self.running[0] = False
         if self.event_handler['exit', 'press']:
@@ -71,11 +78,16 @@ class Engine:
             else:
                 Mixer.theme.stop()
 
+        Mixer.enabled = self.sound_switch.state
+
         if self.exit_button.clicked:
             self.running[0] = False
 
         if self.keys_button.clicked:
             self.key_tooltip.active = not self.key_tooltip.active
+
+        if self.event_handler.hold[0] and self.header.focused:
+            self.drag_window()
 
         if not any(self.running[1:]):
             if self.event_handler["rotate cw", "press"]:
@@ -113,7 +125,8 @@ class Engine:
                     sound = True
                     self.field.data[i] = ['X' for i in range(self.field.cols)]
             if sound:
-                Mixer.SOUNDS["clear"].play()
+                if Mixer.enabled:
+                    Mixer.SOUNDS["clear"].play()
 
             if temp:
                 self.score += temp**2 * 100
@@ -124,7 +137,7 @@ class Engine:
 
     def render(self):
         self.display.fill(COLORS['hud'])
-        pygame.draw.rect(self.display, COLORS["widget"], DIM["header"])
+        pygame.draw.rect(self.display, COLORS["widget"], self.header)
 
         self.field.render(self.display)
         self.next.render(self.display)
@@ -132,8 +145,9 @@ class Engine:
         self.keys_button.render(self.display)
         self.shadow_switch.render(self.display)
         self.music_switch.render(self.display)
+        self.sound_switch.render(self.display)
 
-        text, rect = self.write("Tetris", COLORS["text_2"])
+        text, rect = self.write(self.TITLE, COLORS["text_2"])
         self.display.blit(text, DIM["header_text"])
 
         self.write("Next figure", COLORS["text_2"], DIM["next_label"], self.display)
@@ -153,6 +167,7 @@ class Engine:
 
         self.write("Shadow", COLORS["text_2"], DIM["shadow_label"], self.display)
         self.write("Music", COLORS["text_2"], DIM["music_label"], self.display)
+        self.write("Sound", COLORS["text_2"], DIM["sound_label"], self.display)
 
         self.key_tooltip.render(self.display)
 
@@ -180,6 +195,16 @@ class Engine:
             canvas.blit(surface, rect)
         return surface, rect
 
+    def drag_window(self):
+        pos = wintypes.POINT()
+        windll.user32.GetCursorPos(pointer(pos))
+
+        dx, dy = self.event_handler.drag[0]
+        cx, cy = pos.x, pos.y
+
+        x, y = int(cx - dx), int(cy - dy)
+        windll.user32.MoveWindow(self.window_handle, x, y, *DIM["screen"], True)
+
 
 if __name__ == '__main__':
     pygame.init()
@@ -190,5 +215,5 @@ if __name__ == '__main__':
 
 # TODO:
 #  - egyszerűsítés
-#  - gyorsulás és pálya/pont rendszer kidolgozása
+#  - pálya/pont rendszer kidolgozása
 #  - high score rendszer

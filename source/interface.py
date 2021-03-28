@@ -49,9 +49,9 @@ class Switch(Widget):
 
     IMAGES = []
 
-    def __init__(self, engine, event_handler, pos):
+    def __init__(self, engine, event_handler, pos, state=False):
         super().__init__(engine, event_handler, (*pos, TILE * 2, TILE))
-        self.state = False
+        self.state = state
         self.last_state = False
 
     @property

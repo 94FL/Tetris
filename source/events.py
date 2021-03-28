@@ -45,7 +45,11 @@ class EventHandler:
         self.click = [0, 0, 0]
         self.events = None
         self.temp = self.click[:]
+        self.drag = [vec(0, 0), vec(0, 0)]
         self.now = 0
+
+        self.focus = vec(pygame.mouse.get_pos())
+        self.last_focus = vec(pygame.mouse.get_pos())
 
     def focused(self, rect, carrier=None):
         x, y = self.focus
@@ -60,6 +64,10 @@ class EventHandler:
 
         self.focus = vec(pygame.mouse.get_pos())
         self.hold = pygame.mouse.get_pressed()
+
+        if not self.hold[0]:
+            self.drag[0] = vec(self.focus)
+        self.drag[1] = vec(self.focus)
 
         for key in self.keys.values():
             key.update(hold, self.now)
