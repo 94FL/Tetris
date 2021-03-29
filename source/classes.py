@@ -80,7 +80,7 @@ class Field(pygame.Surface, Matrix):
                 return 2
             if sides and x >= self.cols:
                 return 3
-            if y + pos >= self.rows or x < 0 or self[x, y + pos] or x >= self.cols:
+            if y + pos >= self.rows or x < 0 or x >= self.cols or self[x, y + pos]:
                 return 1
         else:
             return 0
