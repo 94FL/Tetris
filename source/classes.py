@@ -42,7 +42,8 @@ class Matrix:
 class Field(pygame.Surface, Matrix):
 
     FIGURES = FIGURE_NAMES + ("X", "#")
-    SHINE_SHAPE = ((1, 1), (3, 1), (3, 2), (2, 2), (2, 3), (1, 3))
+    # SHINE_SHAPE = ((1, 1), (3, 1), (3, 2), (2, 2), (2, 3), (1, 3))
+    SHINE_SHAPE = ((1, 1), (3, 1), (1, 3))
     IMAGES = {}
 
     def __init__(self, engine, dim, _next):
@@ -60,13 +61,16 @@ class Field(pygame.Surface, Matrix):
     @classmethod
     def generate_images(cls):
         for figure in Field.FIGURES:
-            image = pygame.Surface((TILE, TILE), pygame.SRCALPHA, 32).convert_alpha()
-            temp = image.copy()
-            temp.fill((160, 160, 160))
-            pygame.draw.rect(image, COLORS[figure], (GAP, GAP, TILE - GAP * 2, TILE - GAP * 2))
-            pygame.draw.polygon(temp, (255, 255, 255), [[c * GAP * 2 for c in p] for p in Field.SHINE_SHAPE])
+            alpha = pygame.Surface((TILE, TILE), pygame.SRCALPHA, 32).convert_alpha()
 
-            image.blit(temp, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            image = alpha.copy()
+            pygame.draw.rect(image, COLORS[figure], (GAP, GAP, TILE - GAP * 2, TILE - GAP * 2))
+
+            shine = alpha.copy()
+            shine.fill((160, 160, 160))
+            pygame.draw.polygon(shine, (255, 255, 255), [[c * GAP * 2 for c in p] for p in Field.SHINE_SHAPE])
+
+            image.blit(shine, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
             cls.IMAGES[figure] = image
 
@@ -76,9 +80,10 @@ class Field(pygame.Surface, Matrix):
                 return 2
             if sides and x >= self.cols:
                 return 3
-            if y + pos >= self.rows or self[x, y + pos] or x < 0 or x >= self.cols:
+            if y + pos >= self.rows or x < 0 or self[x, y + pos] or x >= self.cols:
                 return 1
-        return 0
+        else:
+            return 0
 
     @Mixer.play("low blip")
     def drop_figure(self):
@@ -92,6 +97,9 @@ class Field(pygame.Surface, Matrix):
         self.figure.pos += vector
         if self.collide_figure():
             self.figure.pos -= vector
+            return False
+        else:
+            return True
 
     @Mixer.play("blip")
     def rotate_figure(self, direction):
@@ -99,19 +107,16 @@ class Field(pygame.Surface, Matrix):
             self.figure.pos[1] = 1
 
         temp = self.figure.orient
-        self.figure.orient += direction
-
-        if self.figure.orient >= len(self.figure.data):
-            self.figure.orient = 0
-        if self.figure.orient < 0:
-            self.figure.orient = len(self.figure.data) - 1
+        self.figure.orient = (self.figure.orient + direction) % len(self.figure.data)
 
         if self.collide_figure() == 1:
             self.figure.orient = temp
         if self.collide_figure() == 2:
-            self.move_figure(vec((1, 2)[self.figure.figure == "I"], 0))
+            if not self.move_figure(vec(2 if self.figure.figure == "I" else 1, 0)):
+                self.figure.orient = temp
         if self.collide_figure() == 3:
-            self.move_figure(vec(-1, 0))
+            if not self.move_figure(vec(-1, 0)):
+                self.figure.orient = temp
 
     def place_figure(self):
         self.figure.pos += vec(0, self.height())
@@ -179,7 +184,7 @@ class Figure:
         return x, y
 
     def reset(self, shape):
-        self.pos.y = 0
+        self.pos = vec(5, 0)
         self.orient = 0
         self.data = FIGURE_DATA[shape][:]
         self.figure = shape
