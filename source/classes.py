@@ -66,11 +66,11 @@ class Field(pygame.Surface, Matrix):
             image = alpha.copy()
             pygame.draw.rect(image, COLORS[figure], (GAP, GAP, TILE - GAP * 2, TILE - GAP * 2))
 
-            shine = alpha.copy()
-            shine.fill((160, 160, 160))
-            pygame.draw.polygon(shine, (255, 255, 255), [[c * GAP * 2 for c in p] for p in Field.SHINE_SHAPE])
-
-            image.blit(shine, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            # shine = alpha.copy()
+            # shine.fill((150, 150, 150))
+            # pygame.draw.polygon(shine, (255, 255, 255), [[c * GAP * 2 for c in p] for p in Field.SHINE_SHAPE])
+            #
+            # image.blit(shine, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
             cls.IMAGES[figure] = image
 
@@ -86,11 +86,12 @@ class Field(pygame.Surface, Matrix):
             return 0
 
     @Mixer.play("low blip")
-    def drop_figure(self):
+    def drop_figure(self, merge=False):
         self.figure.pos += vec(0, 1)
         if self.collide_figure(False):
             self.figure.pos += vec(0, -1)
-            self.merge_figure()
+            if merge:
+                self.merge_figure()
 
     @Mixer.play("blip")
     def move_figure(self, vector):

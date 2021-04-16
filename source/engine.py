@@ -69,7 +69,7 @@ class Engine:
             self.running[0] = False
         if self.event_handler['pause', 'press']:
             self.running[1] = not self.running[1]
-        if self.event_handler['reset', 'press']:
+        if self.event_handler['reset', 'press'] and self.running[2]:
             self.reset()
 
         if self.music_switch.altered:
@@ -102,6 +102,7 @@ class Engine:
                 self.field.move_figure(vec(1, 0))
             if self.event_handler["move down", "press"] and self.timer.query():
                 self.timer.reset()
+                self.logic_timer.reset()
                 self.field.drop_figure()
             if self.event_handler["place", "press"]:
                 self.field.place_figure()
@@ -109,7 +110,7 @@ class Engine:
     def logic(self):
         if not any(self.running[1:]):
             if self.logic_timer.query():
-                self.field.drop_figure()
+                self.field.drop_figure(True)
             if self.tick_timer.query():
                 for i, row in enumerate(self.field.data):
                     for j in range(len(row)):

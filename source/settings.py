@@ -62,13 +62,13 @@ KEY_DELAYS = {
     "exit": (1000, 1000),
     "pause": (1000, 1000),
     "reset": (1000, 1000),
-    "rotate cw": (200, 100),
-    "rotate ccw": (200, 100),
-    "rotate": (200, 100),
+    "rotate cw": (500, 100),
+    "rotate ccw": (500, 100),
+    "rotate": (500, 100),
     "move left": (120, 20),
     "move right": (120, 20),
     "move down": (120, 20),
-    "place": (200, 100),
+    "place": (1000, 1000),
 }
 
 pygame.font.init()
