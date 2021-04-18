@@ -12,7 +12,7 @@ SOURCE_PATH = os.path.dirname(__file__)
 ROOT = os.path.split(SOURCE_PATH)[0]
 
 FPS = 60
-SCORE = (0, 4, 10, 30, 120)
+SCORE = (0, 40, 100, 300, 1200)
 
 PATH = {
     "data": os.path.join(ROOT, "data"),
@@ -29,10 +29,12 @@ parser.read(PATH["config"])
 
 KEYS = {key: pygame.key.key_code(parser.get("KEYS", key)) for key in parser["KEYS"]}
 
-DELAY = parser.getint("SETTINGS", "period")
+DELAY = parser.getint("SETTINGS", "base period")
 TILE = parser.getint("SETTINGS", "tile size")
 VOLUME = parser.getint("SETTINGS", "volume") / 100
-ACCELERATION = parser.getfloat("SETTINGS", "acceleration")
+STARTING_LEVEL = parser.getint("SETTINGS", "starting level")
+MAX_LEVEL = parser.getint("SETTINGS", "max level")
+KILLER_MODIFIER = parser.getfloat("SETTINGS", "killer modifier")
 
 GAP = TILE // 12
 FIELD = 10, 20
@@ -44,13 +46,11 @@ DIM = {
     "next": (TILE * FIELD[0], TILE // 2 + HEAD),
     "next_label": (TILE * (FIELD[0] + 2.5), TILE + HEAD),
     "score": (TILE * (FIELD[0] + 2.5), TILE * 5.5 + HEAD),
-    "shadow_label": (TILE * (FIELD[0] + 2.5), TILE * 8.5 + HEAD),
-    "shadow_switch": (TILE * (FIELD[0] + 1.5), TILE * 9 + HEAD),
-    "sound_label": (TILE * (FIELD[0] + 2.5), TILE * 11 + HEAD),
-    "sound_switch": (TILE * (FIELD[0] + 1.5), TILE * 11.5 + HEAD),
-    "music_label": (TILE * (FIELD[0] + 2.5), TILE * 13.5 + HEAD),
-    "music_switch": (TILE * (FIELD[0] + 1.5), TILE * 14 + HEAD),
-    "status": (TILE * (FIELD[0] + 2.5), TILE * 16.5 + HEAD),
+    "level": (TILE * (FIELD[0] + 2.5), TILE * 8 + HEAD),
+    "shadow_switch": (TILE * (FIELD[0] + 1.5), TILE * 13 + HEAD),
+    "sound_switch": (TILE * (FIELD[0] + 1.5), TILE * 15.5 + HEAD),
+    "music_switch": (TILE * (FIELD[0] + 1.5), TILE * 18 + HEAD),
+    "status_label": (TILE * (FIELD[0] // 2), TILE * (FIELD[1] // 2)),
     "header": (0, 0, TILE * (FIELD[0] + 5), HEAD),
     "header_text": (GAP, GAP),
     "exit_button": (TILE * (FIELD[0] + 5) - HEAD, 0, HEAD, HEAD),

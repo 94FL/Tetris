@@ -1,4 +1,4 @@
-from settings import TILE, COLORS, GAP, HEAD, parser
+from settings import TILE, COLORS, GAP, HEAD, parser, vec
 import pygame
 
 
@@ -49,14 +49,12 @@ class Switch(Widget):
 
     IMAGES = []
 
-    def __init__(self, engine, event_handler, pos, state=False):
+    def __init__(self, engine, event_handler, pos, label=None, state=False):
         super().__init__(engine, event_handler, (*pos, TILE * 2, TILE))
         self.state = state
-        self.last_state = False
 
-    @property
-    def altered(self):
-        return int(self.state) - int(self.last_state)
+        self.label = label
+        self.label_pos = pos + vec(self.width // 2, -GAP)
 
     def generate_images(self):
         base = pygame.Surface(self.size, pygame.SRCALPHA, 32).convert_alpha()
@@ -86,6 +84,9 @@ class Switch(Widget):
             self.state = not self.state
 
         display.blit(self.images[self.focused][self.state], self)
+
+        if self.label:
+            self.engine.write(self.label, COLORS["text_2"], self.label_pos, self.engine.display, align="midbottom")
 
 
 class KeyTooltip(pygame.Surface):

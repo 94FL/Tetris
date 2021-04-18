@@ -19,18 +19,12 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bdf4f35d-0b59-4827-b590-50b142438736" name="Default Changelist" comment="Commit message">
-      <change afterPath="$PROJECT_DIR$/.idea/Tetris.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="bdf4f35d-0b59-4827-b590-50b142438736" name="Default Changelist" comment="Polishing controls and color update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/data/config.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/data.json" beforeDir="false" afterPath="$PROJECT_DIR$/data/data.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/classes.py" beforeDir="false" afterPath="$PROJECT_DIR$/source/classes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/source/engine.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/source/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/source/interface.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/source/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/source/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -171,7 +165,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617035104062</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Polishing controls and color update">
+      <created>1618595521982</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1618595521982</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -188,7 +189,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Commit message" />
-    <option name="LAST_COMMIT_MESSAGE" value="Commit message" />
+    <MESSAGE value="Polishing controls and color update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Polishing controls and color update" />
   </component>
   <component name="WindowStateProjectService">
     <state x="534" y="234" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1616864459722">
@@ -199,22 +201,22 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="549" y="187" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1617437316771" />
-    <state width="1515" height="224" key="GridCell.Tab.0.bottom" timestamp="1618595461956">
+    <state width="1515" height="224" key="GridCell.Tab.0.bottom" timestamp="1618782383873">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1515" height="224" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1618595461956" />
-    <state width="1515" height="224" key="GridCell.Tab.0.center" timestamp="1618595461956">
+    <state width="1515" height="224" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1618782383873" />
+    <state width="1515" height="224" key="GridCell.Tab.0.center" timestamp="1618782383873">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1515" height="224" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1618595461956" />
-    <state width="1515" height="224" key="GridCell.Tab.0.left" timestamp="1618595461956">
+    <state width="1515" height="224" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1618782383873" />
+    <state width="1515" height="224" key="GridCell.Tab.0.left" timestamp="1618782383873">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1515" height="224" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1618595461956" />
-    <state width="1515" height="224" key="GridCell.Tab.0.right" timestamp="1618595461956">
+    <state width="1515" height="224" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1618782383873" />
+    <state width="1515" height="224" key="GridCell.Tab.0.right" timestamp="1618782383873">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1515" height="224" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1618595461956" />
+    <state width="1515" height="224" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1618782383873" />
     <state width="1515" height="277" key="GridCell.Tab.1.bottom" timestamp="1616801618945">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -231,17 +233,17 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state width="1515" height="277" key="GridCell.Tab.1.right/0.0.1536.864@0.0.1536.864" timestamp="1616801618945" />
-    <state x="361" y="165" key="Vcs.Push.Dialog.v2" timestamp="1617035110913">
+    <state x="361" y="165" key="Vcs.Push.Dialog.v2" timestamp="1618595535752">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="361" y="165" key="Vcs.Push.Dialog.v2/0.0.1536.864@0.0.1536.864" timestamp="1617035110913" />
-    <state x="478" y="165" width="579" height="534" key="find.popup" timestamp="1617033131467">
+    <state x="361" y="165" key="Vcs.Push.Dialog.v2/0.0.1536.864@0.0.1536.864" timestamp="1618595535752" />
+    <state x="478" y="165" width="579" height="534" key="find.popup" timestamp="1618737861406">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="478" y="165" width="579" height="534" key="find.popup/0.0.1536.864@0.0.1536.864" timestamp="1617033131467" />
-    <state x="431" y="181" width="672" height="678" key="search.everywhere.popup" timestamp="1616849646233">
+    <state x="478" y="165" width="579" height="534" key="find.popup/0.0.1536.864@0.0.1536.864" timestamp="1618737861406" />
+    <state x="431" y="181" width="672" height="678" key="search.everywhere.popup" timestamp="1618733492710">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="431" y="181" width="672" height="678" key="search.everywhere.popup/0.0.1536.864@0.0.1536.864" timestamp="1616849646233" />
+    <state x="431" y="181" width="672" height="678" key="search.everywhere.popup/0.0.1536.864@0.0.1536.864" timestamp="1618733492710" />
   </component>
 </project>

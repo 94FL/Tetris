@@ -80,18 +80,17 @@ class Field(pygame.Surface, Matrix):
                 return 2
             if sides and x >= self.cols:
                 return 3
-            if y + pos >= self.rows or x < 0 or x >= self.cols or self[x, y + pos]:
+            if y + pos >= self.rows or self[x, y + pos]:
                 return 1
         else:
             return 0
 
     @Mixer.play("low blip")
     def drop_figure(self, merge=False):
-        self.figure.pos += vec(0, 1)
-        if self.collide_figure(False):
-            self.figure.pos += vec(0, -1)
-            if merge:
-                self.merge_figure()
+        if not self.collide_figure(False, 1):
+            self.figure.pos += vec(0, 1)
+        elif merge:
+            self.merge_figure()
 
     @Mixer.play("blip")
     def move_figure(self, vector):

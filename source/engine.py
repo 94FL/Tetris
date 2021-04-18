@@ -6,11 +6,11 @@ from classes import Field, Next
 from clock import Clock
 from events import EventHandler
 from interface import Widget, Button, Switch, KeyTooltip
-from settings import DIM, FPS, COLORS, KEYS, FONT, TILE, DELAY, VOLUME, ACCELERATION, vec
+from settings import DIM, FPS, COLORS, KEYS, FONT, TILE, DELAY, VOLUME, SCORE, MAX_LEVEL, STARTING_LEVEL, \
+    KILLER_MODIFIER, vec
 
 
 class Engine:
-
     display = pygame.display.set_mode(DIM["screen"], pygame.NOFRAME)
     IMAGES = None
     TITLE = "Tetris"
@@ -32,9 +32,9 @@ class Engine:
 
         self.exit_button = Button(self, self.event_handler, DIM["exit_button"], COLORS["text_1"])
         self.keys_button = Button(self, self.event_handler, DIM["keys_button"], COLORS["text_3"])
-        self.shadow_switch = Switch(self, self.event_handler, DIM["shadow_switch"], state=True)
-        self.music_switch = Switch(self, self.event_handler, DIM["music_switch"])
-        self.sound_switch = Switch(self, self.event_handler, DIM["sound_switch"])
+        self.shadow_switch = Switch(self, self.event_handler, DIM["shadow_switch"], "Shadow", state=True)
+        self.music_switch = Switch(self, self.event_handler, DIM["music_switch"], "Music")
+        self.sound_switch = Switch(self, self.event_handler, DIM["sound_switch"], "Sound")
         self.header = Widget(self, self.event_handler, DIM["header"])
 
         self.running = [False, False, False]
@@ -55,8 +55,10 @@ class Engine:
         self.running = [True, self.running[1], False]
 
         self.score = 0
+        self.lines = 0
+        self.level = STARTING_LEVEL
 
-    def delay(self, time=DELAY):
+    def delay(self, time=DELAY * 0.5):
         self.logic_timer.delay(time)
         self.timer.delay(time)
 
@@ -72,11 +74,11 @@ class Engine:
         if self.event_handler['reset', 'press'] and self.running[2]:
             self.reset()
 
-        if self.music_switch.altered:
+        if self.music_switch.clicked:
             if self.music_switch.state:
-                Mixer.theme.play(-1)
-            else:
                 Mixer.theme.stop()
+            else:
+                Mixer.theme.play(-1)
 
         Mixer.enabled = self.sound_switch.state
 
@@ -91,9 +93,9 @@ class Engine:
 
         if not any(self.running[1:]):
             if self.event_handler["rotate cw", "press"]:
-                self.field.rotate_figure(1)
-            if self.event_handler["rotate ccw", "press"]:
                 self.field.rotate_figure(-1)
+            if self.event_handler["rotate ccw", "press"]:
+                self.field.rotate_figure(1)
             if self.event_handler["rotate", "press"]:
                 self.field.rotate_figure(1)
             if self.event_handler["move left", "press"]:
@@ -129,9 +131,14 @@ class Engine:
                 if Mixer.enabled:
                     Mixer.SOUNDS["clear"].play()
 
+            # progress
             if temp:
-                self.score += temp**2 * 100
-                self.logic_timer.modifier *= (1 - ACCELERATION)
+                self.lines += temp
+                self.level = min(self.lines // 10 + 1, MAX_LEVEL)
+                self.score += SCORE[temp] * self.level
+
+                self.logic_timer.modifier = (KILLER_MODIFIER ** (1 / (MAX_LEVEL - 1))) ** (self.level - 1)
+
             for element in self.field.data[0]:
                 if element:
                     self.game_over()
@@ -155,20 +162,17 @@ class Engine:
         self.write("Score", COLORS["text_2"], DIM["score"], self.display)
         self.write(str(self.score), COLORS["text_1"], DIM["score"] + vec(0, TILE), self.display, large=True)
 
-        if self.running[2]:
-            self.write("GAME OVER", COLORS["text_1"], self.field.rect.center, self.display, large=True)
-            self.write('press "r"', COLORS["text_2"], DIM["status"] + vec(0, TILE * 1.5), self.display)
-            self.write("to restart", COLORS["text_2"], DIM["status"] + vec(0, TILE * 2.5), self.display)
-        elif self.running[1]:
-            self.write("PAUSED", COLORS["text_1"], DIM["status"], self.display, large=True)
-            self.write('press "p"', COLORS["text_2"], DIM["status"] + vec(0, TILE * 1.5), self.display)
-            self.write("to continue", COLORS["text_2"], DIM["status"] + vec(0, TILE * 2.5), self.display)
-        else:
-            self.write("TETRIS", COLORS["field"], DIM["status"] + vec(0, TILE * 2.5), self.display, large=True)
+        self.write("Level", COLORS["text_2"], DIM["level"], self.display)
+        self.write(str(self.level), COLORS["text_1"], DIM["level"] + vec(0, TILE), self.display, large=True)
 
-        self.write("Shadow", COLORS["text_2"], DIM["shadow_label"], self.display)
-        self.write("Music", COLORS["text_2"], DIM["music_label"], self.display)
-        self.write("Sound", COLORS["text_2"], DIM["sound_label"], self.display)
+        if self.running[2]:
+            self.write("GAME OVER", COLORS["text_1"], DIM["status_label"], self.display, large=True)
+            self.write('press "r"', COLORS["text_2"], DIM["status_label"] + vec(0, TILE * 1.5), self.display)
+            self.write("to restart", COLORS["text_2"], DIM["status_label"] + vec(0, TILE * 2.5), self.display)
+        elif self.running[1]:
+            self.write("PAUSED", COLORS["text_1"], DIM["status_label"], self.display, large=True)
+            self.write('press "p"', COLORS["text_2"], DIM["status_label"] + vec(0, TILE * 1.5), self.display)
+            self.write("to continue", COLORS["text_2"], DIM["status_label"] + vec(0, TILE * 2.5), self.display)
 
         self.key_tooltip.render(self.display)
 
@@ -188,10 +192,10 @@ class Engine:
         self.running[2] = True
 
     @staticmethod
-    def write(text, color, pos=(0, 0), canvas=None, large=False):
+    def write(text, color, pos=(0, 0), canvas=None, large=False, align="center"):
         surface = FONT[large].render(text, False, color)
         rect = surface.get_rect()
-        rect.center = pos
+        setattr(rect, align, pos)
         if canvas is not None:
             canvas.blit(surface, rect)
         return surface, rect
@@ -213,8 +217,6 @@ if __name__ == '__main__':
     engine.loop()
     pygame.quit()
 
-
 # TODO:
 #  - egyszerűsítés
-#  - pálya/pont rendszer kidolgozása
 #  - high score rendszer
