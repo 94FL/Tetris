@@ -35,6 +35,8 @@ VOLUME = parser.getint("SETTINGS", "volume") / 100
 STARTING_LEVEL = parser.getint("SETTINGS", "starting level")
 MAX_LEVEL = parser.getint("SETTINGS", "max level")
 KILLER_MODIFIER = parser.getfloat("SETTINGS", "killer modifier")
+NEW_DELAY = parser.getint("SETTINGS", "new delay")
+THEME = parser.getboolean("SETTINGS", "theme")
 
 GAP = TILE // 12
 FIELD = 10, 20
@@ -47,10 +49,11 @@ DIM = {
     "next_label": (TILE * (FIELD[0] + 2.5), TILE + HEAD),
     "score": (TILE * (FIELD[0] + 2.5), TILE * 5.5 + HEAD),
     "level": (TILE * (FIELD[0] + 2.5), TILE * 8 + HEAD),
-    "shadow_switch": (TILE * (FIELD[0] + 1.5), TILE * 13 + HEAD),
-    "sound_switch": (TILE * (FIELD[0] + 1.5), TILE * 15.5 + HEAD),
-    "music_switch": (TILE * (FIELD[0] + 1.5), TILE * 18 + HEAD),
-    "status_label": (TILE * (FIELD[0] // 2), TILE * (FIELD[1] // 2)),
+    "shadow_switch": (TILE * (FIELD[0] + 1.5), TILE * 11 + HEAD),
+    "sound_switch": (TILE * (FIELD[0] + 1.5), TILE * 13.5 + HEAD),
+    "music_switch": (TILE * (FIELD[0] + 1.5), TILE * 16 + HEAD),
+    "theme_switch": (TILE * (FIELD[0] + 1.5), TILE * 18.5 + HEAD),
+    "label": (TILE * (FIELD[0] // 2), TILE * (FIELD[1] // 2)),
     "header": (0, 0, TILE * (FIELD[0] + 5), HEAD),
     "header_text": (GAP, GAP),
     "exit_button": (TILE * (FIELD[0] + 5) - HEAD, 0, HEAD, HEAD),
@@ -69,6 +72,7 @@ KEY_DELAYS = {
     "move right": (120, 20),
     "move down": (120, 20),
     "place": (1000, 1000),
+    "theme": (1000, 1000),
 }
 
 pygame.font.init()
@@ -80,7 +84,7 @@ FONT = (
 with open(PATH["datafile"], 'r') as FILE:
     DATA = json.load(FILE)
 
-    COLORS = DATA["colors"]
     FIGURE_DATA = DATA["figures"]
     FIGURE_NAMES = tuple(FIGURE_DATA.keys())
     SOUND_DATA = DATA["sounds"]
+    THEMES = ("dark", "light")

@@ -1,7 +1,7 @@
 import random
 
 import pygame
-from settings import FIGURE_DATA, FIGURE_NAMES, TILE, COLORS, GAP, vec
+from settings import FIGURE_DATA, FIGURE_NAMES, TILE, GAP, NEW_DELAY, vec
 from audio import Mixer
 
 
@@ -41,11 +41,6 @@ class Matrix:
 
 class Field(pygame.Surface, Matrix):
 
-    FIGURES = FIGURE_NAMES + ("X", "#")
-    # SHINE_SHAPE = ((1, 1), (3, 1), (3, 2), (2, 2), (2, 3), (1, 3))
-    SHINE_SHAPE = ((1, 1), (3, 1), (1, 3))
-    IMAGES = {}
-
     def __init__(self, engine, dim, _next):
         pygame.Surface.__init__(self, (dim[2] * TILE, dim[3] * TILE))
         Matrix.__init__(self, dim[2], dim[3])
@@ -57,22 +52,6 @@ class Field(pygame.Surface, Matrix):
         self.figure.reset(_next)
 
         self.background = pygame.Surface((dim[2] * TILE, dim[3] * TILE))
-
-    @classmethod
-    def generate_images(cls):
-        for figure in Field.FIGURES:
-            alpha = pygame.Surface((TILE, TILE), pygame.SRCALPHA, 32).convert_alpha()
-
-            image = alpha.copy()
-            pygame.draw.rect(image, COLORS[figure], (GAP, GAP, TILE - GAP * 2, TILE - GAP * 2))
-
-            # shine = alpha.copy()
-            # shine.fill((150, 150, 150))
-            # pygame.draw.polygon(shine, (255, 255, 255), [[c * GAP * 2 for c in p] for p in Field.SHINE_SHAPE])
-            #
-            # image.blit(shine, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
-
-            cls.IMAGES[figure] = image
 
     def collide_figure(self, sides=True, pos=0):
         for x, y in self.figure:
@@ -128,28 +107,30 @@ class Field(pygame.Surface, Matrix):
             self[x, y] = self.figure.figure
         self.figure.reset(self.engine.next_figure)
 
+        if self.collide_figure() == 1:
+            self.engine.game_over()
         if self.collide_figure() == 2:
             self.move_figure(vec((1, 2)[self.figure.figure == "I"], 0))
         if self.collide_figure() == 3:
             self.move_figure(vec(-1, 0))
 
-        self.engine.delay()
+        self.engine.delay(NEW_DELAY)
         self.engine.next_figure = self.engine.next()
 
     def render(self, surface):
-        self.fill(COLORS['field'])
+        self.fill(self.engine.graphics['field'])
         height = self.height()
 
         for x, y, tile in self:
             if tile:
-                self.blit(Field.IMAGES[tile], (x * TILE, y * TILE))
+                self.blit(self.engine.graphics[tile], (x * TILE, y * TILE))
 
         for x, y in self.figure:
-            self.blit(Field.IMAGES[self.figure.figure], (x * TILE, y * TILE))
+            self.blit(self.engine.graphics[self.figure.figure], (x * TILE, y * TILE))
 
             if self.engine.shadow_switch.state:
                 rect = pygame.Rect(x * TILE + GAP, (y + height) * TILE + GAP, TILE - GAP * 2, TILE - GAP * 2)
-                pygame.draw.rect(self, COLORS["shadow"], rect, 2)
+                pygame.draw.rect(self, self.engine.graphics["shadow"], rect, 2)
 
         surface.blit(self, self.rect)
 
@@ -217,4 +198,4 @@ class Next:
         figure = self.engine.next_figure
         array = [vec(element) + vec(Next.POS[figure]) for element in FIGURE_DATA[figure][0]]
         for x, y in array:
-            surface.blit(Field.IMAGES[figure], vec(x * TILE, y * TILE) + self.pos)
+            surface.blit(self.engine.graphics[figure], vec(x * TILE, y * TILE) + self.pos)

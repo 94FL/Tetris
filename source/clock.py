@@ -43,7 +43,7 @@ class Timer:
             self.period = period
 
     def delay(self, period):
-        self.statemark += period
+        self.statemark = self.clock.now + period
 
     def update(self):
         self.signal[1] = self.signal[0]

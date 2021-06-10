@@ -1,12 +1,14 @@
 from ctypes import windll, wintypes, pointer
 
 import pygame
+from graphics import Graphics
+
 from audio import Mixer
 from classes import Field, Next
 from clock import Clock
 from events import EventHandler
 from interface import Widget, Button, Switch, KeyTooltip
-from settings import DIM, FPS, COLORS, KEYS, FONT, TILE, DELAY, VOLUME, SCORE, MAX_LEVEL, STARTING_LEVEL, \
+from settings import DIM, FPS, KEYS, FONT, TILE, DELAY, VOLUME, SCORE, MAX_LEVEL, STARTING_LEVEL, \
     KILLER_MODIFIER, vec
 
 
@@ -17,10 +19,10 @@ class Engine:
 
     def __init__(self):
 
-        Field.generate_images()
         Mixer.set_volume(VOLUME)
-
         self.window_handle = pygame.display.get_wm_info()['window']
+
+        self.graphics = Graphics(self)
 
         self.clock = Clock()
         self.logic_timer = self.clock.timer(DELAY, periodic=True)
@@ -30,11 +32,12 @@ class Engine:
         self.event_handler = EventHandler(self.clock, KEYS)
         self.key_tooltip = KeyTooltip(self, DIM["keys_tooltip"])
 
-        self.exit_button = Button(self, self.event_handler, DIM["exit_button"], COLORS["text_1"])
-        self.keys_button = Button(self, self.event_handler, DIM["keys_button"], COLORS["text_3"])
+        self.exit_button = Button(self, self.event_handler, DIM["exit_button"], "text_1")
+        self.keys_button = Button(self, self.event_handler, DIM["keys_button"], "text_3")
         self.shadow_switch = Switch(self, self.event_handler, DIM["shadow_switch"], "Shadow", state=True)
         self.music_switch = Switch(self, self.event_handler, DIM["music_switch"], "Music")
         self.sound_switch = Switch(self, self.event_handler, DIM["sound_switch"], "Sound")
+        self.theme_switch = Switch(self, self.event_handler, DIM["theme_switch"], "Light")
         self.header = Widget(self, self.event_handler, DIM["header"])
 
         self.running = [False, False, False]
@@ -54,9 +57,10 @@ class Engine:
 
         self.running = [True, self.running[1], False]
 
-        self.score = 0
         self.lines = 0
-        self.level = STARTING_LEVEL
+        self.score = 0
+        self.level = min(self.lines // 10 + STARTING_LEVEL, MAX_LEVEL)
+        self.logic_timer.modifier = (KILLER_MODIFIER ** (1 / MAX_LEVEL)) ** (self.level - 1)
 
     def delay(self, time=DELAY * 0.5):
         self.logic_timer.delay(time)
@@ -73,6 +77,8 @@ class Engine:
             self.running[1] = not self.running[1]
         if self.event_handler['reset', 'press'] and self.running[2]:
             self.reset()
+        if self.event_handler['theme', 'press']:
+            self.theme_switch.flip()
 
         if self.music_switch.clicked:
             if self.music_switch.state:
@@ -134,18 +140,17 @@ class Engine:
             # progress
             if temp:
                 self.lines += temp
-                self.level = min(self.lines // 10 + 1, MAX_LEVEL)
+                self.level = min(self.lines // 10 + STARTING_LEVEL, MAX_LEVEL)
                 self.score += SCORE[temp] * self.level
-
-                self.logic_timer.modifier = (KILLER_MODIFIER ** (1 / (MAX_LEVEL - 1))) ** (self.level - 1)
+                self.logic_timer.modifier = (KILLER_MODIFIER ** (1 / MAX_LEVEL)) ** (self.level - 1)
 
             for element in self.field.data[0]:
                 if element:
                     self.game_over()
 
     def render(self):
-        self.display.fill(COLORS['hud'])
-        pygame.draw.rect(self.display, COLORS["widget"], self.header)
+        self.display.fill(self.graphics['hud'])
+        pygame.draw.rect(self.display, self.graphics["widget"], self.header)
 
         self.field.render(self.display)
         self.next.render(self.display)
@@ -154,25 +159,26 @@ class Engine:
         self.shadow_switch.render(self.display)
         self.music_switch.render(self.display)
         self.sound_switch.render(self.display)
+        self.theme_switch.render(self.display)
 
-        text, rect = self.write(self.TITLE, COLORS["text_2"])
+        text, rect = self.write(self.TITLE, self.graphics["text_2"])
         self.display.blit(text, DIM["header_text"])
 
-        self.write("Next figure", COLORS["text_2"], DIM["next_label"], self.display)
-        self.write("Score", COLORS["text_2"], DIM["score"], self.display)
-        self.write(str(self.score), COLORS["text_1"], DIM["score"] + vec(0, TILE), self.display, large=True)
+        self.write("Next figure", self.graphics["text_2"], DIM["next_label"], self.display)
+        self.write("Score", self.graphics["text_2"], DIM["score"], self.display)
+        self.write(str(self.score), self.graphics["text_1"], DIM["score"] + vec(0, TILE), self.display, True)
 
-        self.write("Level", COLORS["text_2"], DIM["level"], self.display)
-        self.write(str(self.level), COLORS["text_1"], DIM["level"] + vec(0, TILE), self.display, large=True)
+        self.write("Level", self.graphics["text_2"], DIM["level"], self.display)
+        self.write(str(self.level), self.graphics["text_1"], DIM["level"] + vec(0, TILE), self.display, True)
 
         if self.running[2]:
-            self.write("GAME OVER", COLORS["text_1"], DIM["status_label"], self.display, large=True)
-            self.write('press "r"', COLORS["text_2"], DIM["status_label"] + vec(0, TILE * 1.5), self.display)
-            self.write("to restart", COLORS["text_2"], DIM["status_label"] + vec(0, TILE * 2.5), self.display)
+            self.write("GAME OVER", self.graphics["text_1"], DIM["label"], self.display, True)
+            self.write('press "r"', self.graphics["text_2"], DIM["label"] + vec(0, TILE * 1.5), self.display)
+            self.write("to restart", self.graphics["text_2"], DIM["label"] + vec(0, TILE * 2.5), self.display)
         elif self.running[1]:
-            self.write("PAUSED", COLORS["text_1"], DIM["status_label"], self.display, large=True)
-            self.write('press "p"', COLORS["text_2"], DIM["status_label"] + vec(0, TILE * 1.5), self.display)
-            self.write("to continue", COLORS["text_2"], DIM["status_label"] + vec(0, TILE * 2.5), self.display)
+            self.write("PAUSED", self.graphics["text_1"], DIM["label"], self.display, True)
+            self.write('press "p"', self.graphics["text_2"], DIM["label"] + vec(0, TILE * 1.5), self.display)
+            self.write("to continue", self.graphics["text_2"], DIM["label"] + vec(0, TILE * 2.5), self.display)
 
         self.key_tooltip.render(self.display)
 
@@ -220,3 +226,4 @@ if __name__ == '__main__':
 # TODO:
 #  - egyszerűsítés
 #  - high score rendszer
+#  - dinamikus színek

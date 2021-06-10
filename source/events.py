@@ -37,10 +37,8 @@ class Key:
 class EventHandler:
 
     def __init__(self, clock, keys):
-        data = {key: (keys[key], delay) for key, delay in KEY_DELAYS.items()}
-
         self.clock = clock
-        self.keys = {key: Key(value[0], value[1], clock) for key, value in data.items()}
+        self.keys = {key: Key(keys[key], delay, clock) for key, delay in KEY_DELAYS.items()}
         self.hold = [0, 0, 0]
         self.click = [0, 0, 0]
         self.events = None
