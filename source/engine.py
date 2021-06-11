@@ -16,12 +16,15 @@ class Engine:
     display = pygame.display.set_mode(DIM["screen"], pygame.NOFRAME)
     IMAGES = None
     TITLE = "Tetris"
+    ICON = pygame.image.load('../data/tetris.png')
 
     def __init__(self):
 
         Mixer.set_volume(VOLUME)
         self.window_handle = pygame.display.get_wm_info()['window']
-        pygame.display.set_caption("Tetris")
+
+        pygame.display.set_icon(self.ICON)
+        pygame.display.set_caption(self.TITLE)
 
         self.graphics = Graphics(self)
 
