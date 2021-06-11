@@ -9,7 +9,7 @@ from clock import Clock
 from events import EventHandler
 from interface import Widget, Button, Switch, KeyTooltip
 from settings import DIM, FPS, KEYS, FONT, TILE, DELAY, VOLUME, SCORE, MAX_LEVEL, STARTING_LEVEL, \
-    KILLER_MODIFIER, vec
+    KILLER_MODIFIER, vec, parser
 
 
 class Engine:
@@ -172,12 +172,14 @@ class Engine:
         self.write(str(self.level), self.graphics["text_1"], DIM["level"] + vec(0, TILE), self.display, True)
 
         if self.running[2]:
+            gameo_label = f'press "{str(parser.get("KEYS", "reset"))}"'
             self.write("GAME OVER", self.graphics["text_1"], DIM["label"], self.display, True)
-            self.write('press "r"', self.graphics["text_2"], DIM["label"] + vec(0, TILE * 1.5), self.display)
+            self.write(gameo_label, self.graphics["text_2"], DIM["label"] + vec(0, TILE * 1.5), self.display)
             self.write("to restart", self.graphics["text_2"], DIM["label"] + vec(0, TILE * 2.5), self.display)
         elif self.running[1]:
+            pause_label = f'press "{str(parser.get("KEYS", "pause"))}"'
             self.write("PAUSED", self.graphics["text_1"], DIM["label"], self.display, True)
-            self.write('press "p"', self.graphics["text_2"], DIM["label"] + vec(0, TILE * 1.5), self.display)
+            self.write(pause_label, self.graphics["text_2"], DIM["label"] + vec(0, TILE * 1.5), self.display)
             self.write("to continue", self.graphics["text_2"], DIM["label"] + vec(0, TILE * 2.5), self.display)
 
         self.key_tooltip.render(self.display)
