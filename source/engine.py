@@ -21,6 +21,7 @@ class Engine:
 
         Mixer.set_volume(VOLUME)
         self.window_handle = pygame.display.get_wm_info()['window']
+        pygame.display.set_caption("Tetris")
 
         self.graphics = Graphics(self)
 
