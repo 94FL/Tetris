@@ -80,6 +80,9 @@ class Engine:
         if self.event_handler['theme', 'press']:
             self.theme_switch.flip()
 
+        if not pygame.key.get_focused():  # or not pygame.mouse.get_focused():  # (only for extreme focus mode)
+            self.running[1] = True
+
         if self.music_switch.clicked:
             if self.music_switch.state:
                 Mixer.theme.stop()
