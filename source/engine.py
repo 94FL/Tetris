@@ -54,6 +54,10 @@ class Engine:
         self.field = Field(self, DIM['field'], self.next())
         self.next_figure = self.next()
 
+        self.background_shade = self.field.background
+        self.background_shade.set_alpha(160)
+        self.background_shade.fill((0, 0, 0))
+
         self.logic_timer.modifier = 1
 
         if self.running[2] and self.music_switch.state:
@@ -179,11 +183,13 @@ class Engine:
         self.write(str(self.level), self.graphics["text_1"], DIM["level"] + vec(0, TILE), self.display, True)
 
         if self.running[2]:
+            self.display.blit(self.background_shade, (DIM["field"][0], DIM["field"][1]))
             gameo_label = f'press "{str(parser.get("KEYS", "reset"))}"'
             self.write("GAME OVER", self.graphics["text_1"], DIM["label"], self.display, True)
             self.write(gameo_label, self.graphics["text_2"], DIM["label"] + vec(0, TILE * 1.5), self.display)
             self.write("to restart", self.graphics["text_2"], DIM["label"] + vec(0, TILE * 2.5), self.display)
         elif self.running[1]:
+            self.display.blit(self.background_shade, (DIM["field"][0], DIM["field"][1]))
             pause_label = f'press "{str(parser.get("KEYS", "pause"))}"'
             self.write("PAUSED", self.graphics["text_1"], DIM["label"], self.display, True)
             self.write(pause_label, self.graphics["text_2"], DIM["label"] + vec(0, TILE * 1.5), self.display)
